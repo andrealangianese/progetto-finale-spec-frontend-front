@@ -12,7 +12,7 @@ function App() {
         <NavBar />
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/viaggi" element={<DetailPage />} />
+          <Route path="/travels/:id" element={<DetailPage />} />
           <Route path="/destinazioni-preferite" element={<FavouritePage />} />
           <Route path="/comparazione-viaggi" element={<ComparePage />} />
         </Routes>
