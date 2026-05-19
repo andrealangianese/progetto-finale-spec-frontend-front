@@ -2,7 +2,8 @@ import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
 
 export default function DetailPage() {
-    // Recupera l'id dall'URL 
+
+    // Recupero l'id dall'URL 
     const { id } = useParams()
 
     // Stato per il singolo viaggio (inizialmente null)
@@ -20,9 +21,7 @@ export default function DetailPage() {
                 return res.json();
             })
             .then(data => {
-                console.log("Dati grezzi dal server:", data);
-
-                // Invece di 'setViaggio(data)', salvo direttamente l'oggetto 'travel' che c'è al suo interno!
+                // Invece di 'setViaggio(data)', salvo direttamente l'oggetto 'travel' che c'è al suo interno
                 if (data.travel) {
                     setViaggio(data.travel);
                 } else {

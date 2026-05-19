@@ -18,7 +18,6 @@ export default function NavBar() {
                 </div>
                 <div className="navbar-links">
                     <Link to='/' className="navbar-link">Home</Link>
-                    <Link to='/viaggi' className="navbar-link">Viaggi</Link>
                     <Link to='/destinazioni-preferite' className="navbar-link">Destinazioni Preferite</Link>
                     <Link to='/comparazione-viaggi' className="navbar-link">Comparazione Viaggi</Link>
                 </div>
