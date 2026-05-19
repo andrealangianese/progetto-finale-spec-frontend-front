@@ -33,3 +33,178 @@
     color: #2b4d90;
 
 }
+
+/* Contenitore Principale */
+.homepage-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+.homepage-title {
+    font-size: 2.2rem;
+    margin-bottom: 30px;
+    font-weight: 700;
+}
+
+/* Pannello dei Filtri */
+.filters-panel {
+    display: flex;
+    gap: 15px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 35px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 180px;
+}
+
+.filter-group.flex-grow {
+    flex-grow: 1;
+}
+
+.filter-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.filter-input,
+.filter-select {
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    background-color: #ffffff;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.filter-input:focus,
+.filter-select:focus {
+    border-color: #00adb5;
+    box-shadow: 0 0 0 3px rgba(0, 173, 181, 0.15);
+}
+
+/* Griglia dei Viaggi */
+.travels-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Scheda del Singolo Viaggio */
+.travel-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #eef0f2;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.travel-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.travel-card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.travel-card-title {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #222;
+}
+
+.travel-card-category {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background-color: #e3fafc;
+    color: #0c8599;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* Pulsante Dettaglio */
+.travel-card-button {
+    padding: 10px 18px;
+    background-color: #00adb5;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.travel-card-button:hover {
+    background-color: #008c92;
+}
+
+.travel-card-button:active {
+    transform: scale(0.97);
+}
+
+/* Messaggio di Nessun Risultato */
+.no-results {
+    text-align: center;
+    color: #888;
+    padding: 40px 0;
+    font-style: italic;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        /* Incolonna il logo e i link sui telefoni */
+        gap: 15px;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .navbar-links {
+        width: 100%;
+        justify-content: center;
+        /* Centra i link orizzontalmente */
+        gap: 25px;
+        /* Spazia leggermente di più i link per renderli più facili da tappare */
+    }
+
+    .filters-panel {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .travel-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .travel-card-button {
+        width: 100%;
+        text-align: center;
+    }
+}

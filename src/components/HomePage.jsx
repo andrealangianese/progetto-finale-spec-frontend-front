@@ -45,48 +45,70 @@ export default function HomePage() {
     })
 
     return (
-        <>
-            <h1>I nostri viaggi</h1>
-            {/* ricerca per testo */}
-            <input
-                type="text"
-                placeholder="Cerca per titolo"
-                onChange={e => setCercaViaggiNome(e.target.value)}
-            />
-            {/* ricerca per categorie con select */}
-            <div>
-                <label>Filtra per categoria</label>
-                <select
-                    value={cercaViaggiCategoria}
-                    onChange={e => setCercaViaggiCategoria(e.target.value)}
-                >
-                    {/* stampo tutte le categorie solo una volta */}
-                    {categorieUniche.map((cat, index) => (
-                        <option key={index} value={cat}>
-                            {cat}
-                        </option>
-                    ))}
-                </select>
+        <div className="homepage-container">
+            <h1 className="homepage-title">I nostri viaggi all'insegna dell'avventura</h1>
+
+            {/* PANNELLO FILTRI */}
+            <div className="filters-panel">
+                {/* ricerca per testo */}
+                <div className="filter-group flex-grow">
+                    <label className="filter-label">Cerca per titolo</label>
+                    <input
+                        type="text"
+                        placeholder="Es: Downhill, Surf..."
+                        onChange={e => setCercaViaggiNome(e.target.value)}
+                        className="filter-input"
+                    />
+                </div>
+
+                {/* ricerca per categorie con select */}
+                <div className="filter-group">
+                    <label className="filter-label">Filtra per categoria</label>
+                    <select
+                        value={cercaViaggiCategoria}
+                        onChange={e => setCercaViaggiCategoria(e.target.value)}
+                        className="filter-select"
+                    >
+                        {/* stampo tutte le categorie solo una volta */}
+                        {categorieUniche.map((cat, index) => (
+                            <option key={index} value={cat}>
+                                {cat}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* ordinamento ordine crescente e decrescente */}
+                <div className="filter-group">
+                    <label className="filter-label">Ordina per</label>
+                    <select
+                        value={ordinamentoAlfabetico}
+                        onChange={e => setOrdinamentoAlfabetico(e.target.value)}
+                        className="filter-select"
+                    >
+                        <option value="">Ordine di Default</option>
+                        <option value="title-asc">Titoli da A - Z</option>
+                        <option value="title-desc">Titoli da Z - A</option>
+                    </select>
+                </div>
             </div>
-            {/* ordinamento ordine crescente e decrescente */}
-            <label> Ordina per:</label>
-            <select
-                value={ordinamentoAlfabetico}
-                onChange={e => setOrdinamentoAlfabetico(e.target.value)}
-            >
-                <option value="">Ordine di Default</option>
-                <option value="title-asc">Titoli da A - Z</option>
-                <option value="title-desc">Titoli da Z - A</option>
-            </select>
+
             {/* lista dei risultati finali */}
-            {viaggiOrdinati.length > 0 ? (
-                viaggiOrdinati.map((viaggio, index) => (
-                    <div key={index}>
-                        <h3>{viaggio.title}</h3>
-                        <p>Categoria: {viaggio.category}</p>
-                    </div>
-                ))
-            ) : <p>Non è stato trovato nulla</p>}
-        </>
+            <div className="travels-grid">
+                {viaggiOrdinati.length > 0 ? (
+                    viaggiOrdinati.map((viaggio, index) => (
+                        <div key={index} className="travel-card">
+                            <div className="travel-card-content">
+                                <h3 className="travel-card-title">{viaggio.title}</h3>
+                                <span className="travel-card-category">{viaggio.category}</span>
+                            </div>
+                            <button className="travel-card-button">Vai al dettaglio del Viaggio</button>
+                        </div>
+                    ))
+                ) : (
+                    <p className="no-results">Non è stato trovato nulla che corrisponda ai filtri applicati.</p>
+                )}
+            </div>
+        </div>
     )
 }
