@@ -45,6 +45,38 @@ export default function HomePage() {
         return 0;
     })
 
+    const aggiungiAlComparatoreDalDettaglio = () => {
+        const salvati = JSON.parse(localStorage.getItem("travels_comparator")) || [];
+        const giaPresente = salvati.some(item => item.id === viaggio.id);
+
+        if (giaPresente) {
+            alert("Questo viaggio è già presente nel comparatore!");
+            return;
+        }
+
+        const nuoviSalvati = [...salvati, viaggio];
+        localStorage.setItem("travels_comparator", JSON.stringify(nuoviSalvati));
+        alert(`${viaggio.title} aggiunto al comparatore!`);
+    };
+
+    const aggiungiAlComparatore = (viaggio) => {
+        // 1. Prendo l'array salvato nel browser (se non c'è nulla, parto da un array vuoto)
+        const salvati = JSON.parse(localStorage.getItem("travels_comparator")) || [];
+
+        // 2. Controllo se questo viaggio è già stato inserito
+        const giaPresente = salvati.some(item => item.id === viaggio.id);
+
+        if (giaPresente) {
+            alert("Questo viaggio è già presente nel comparatore!");
+            return;
+        }
+
+        // 3. Aggiungo il viaggio corrente alla lista e salvo tutto nel browser
+        const nuoviSalvati = [...salvati, viaggio];
+        localStorage.setItem("travels_comparator", JSON.stringify(nuoviSalvati));
+        alert(`${viaggio.title} aggiunto al comparatore!`);
+    };
+
     return (
         <div className="homepage-container">
             <h1 className="homepage-title">I nostri viaggi all'insegna dell'avventura</h1>
@@ -103,9 +135,17 @@ export default function HomePage() {
                                 <h3 className="travel-card-title">{viaggio.title}</h3>
                                 <span className="travel-card-category">{viaggio.category}</span>
                             </div>
-                            <Link to={`/travels/${viaggio.id}`} className="travel-card-button">
-                                Vai al dettaglio del Viaggio
-                            </Link>
+                            {/* bottone per la comparazione dei viaggi*/}
+                            <div>
+
+                                <button onClick={() => aggiungiAlComparatore(viaggio)}>
+                                    Confronta
+                                </button>
+                                <Link to={`/travels/${viaggio.id}`} className="travel-card-button">
+                                    Dettagli del Viaggio
+                                </Link>
+                            </div>
+
                         </div>
                     ))
                 ) : (

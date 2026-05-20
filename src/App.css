@@ -238,7 +238,6 @@
     font-size: 2.2rem;
     margin: 0 0 10px 0;
     color: #281313;
-    /* Riprende il marrone scuro della tua Navbar */
     line-height: 1.2;
 }
 
@@ -272,7 +271,6 @@
     flex-direction: column;
     gap: 4px;
     border-left: 4px solid #00adb5;
-    /* Richiamo turchese coordinato */
 }
 
 .spec-label {
@@ -327,6 +325,135 @@
     font-weight: 500;
 }
 
+/* detailpage */
+
+.travel-card button,
+.detail-actions button {
+    padding: 10px 18px;
+    background-color: #00adb5;
+    /* Il tuo turchese */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.travel-card button:hover,
+.detail-actions button:hover {
+    background-color: #008c92;
+    /* Il tuo turchese scuro */
+}
+
+.travel-card button:active,
+.detail-actions button:active {
+    transform: scale(0.97);
+}
+
+/* Allineamento dei pulsanti nella card (se vuoi tenerli vicini nella riga) */
+.travel-card {
+    gap: 12px;
+}
+
+/* Stile specifico per la pagina Comparatore (Usa le stesse regole della tua Home) */
+.compare-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+.compare-page h1 {
+    font-size: 2.2rem;
+    margin-bottom: 30px;
+    font-weight: 700;
+    color: #281313;
+}
+
+.compare-page h2 {
+    font-size: 1.5rem;
+    margin: 30px 0 20px 0;
+    font-weight: 700;
+    color: #281313;
+}
+
+/* Contenitore Flex per affiancare le schede vicino */
+.flex-container {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+/* La singola scheda di confronto (Prende lo stile identico alla tua travel-card) */
+.scheda-confronto {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 20px;
+    background-color: #ffffff;
+    border: 1px solid #eef0f2;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    width: 280px;
+    position: relative;
+}
+
+/* Effetto hover coerente con le tue card della Home */
+.scheda-confronto:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Pulsante Rimuovi posizionato sulla scheda */
+.scheda-confronto button {
+    align-self: flex-end;
+    background-color: #ff6b6b;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+}
+
+.scheda-confronto button:hover {
+    background-color: #fa5252;
+}
+
+/* Uniformiamo i paragrafi interni alle caratteristiche del confronto */
+.scheda-confronto p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #444;
+    border-bottom: 1px dashed #eef0f2;
+    padding-bottom: 6px;
+}
+
+.scheda-confronto p strong {
+    color: #666;
+}
+
+.scheda-confronto h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #222;
+}
+
+@media (max-width: 992px) {
+    .detail-layout {
+        flex-direction: column;
+    }
+
+    .detail-media {
+        min-width: 100%;
+        height: 350px;
+    }
+
+    .detail-info {
+        padding: 30px;
+    }
+}
+
 /* Mobile Responsive */
 @media (max-width: 768px) {
     .navbar {
@@ -359,20 +486,6 @@
     }
 }
 
-@media (max-width: 992px) {
-    .detail-layout {
-        flex-direction: column;
-    }
-
-    .detail-media {
-        min-width: 100%;
-        height: 350px;
-    }
-
-    .detail-info {
-        padding: 30px;
-    }
-}
 
 @media (max-width: 576px) {
 

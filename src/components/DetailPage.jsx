@@ -39,6 +39,20 @@ export default function DetailPage() {
     if (loading) return <p className="detail-loading">Caricamento in corso...</p>
     if (!viaggio) return <p className="detail-error">Viaggio non trovato!</p>
 
+    const aggiungiAlComparatoreDalDettaglio = () => {
+        const salvati = JSON.parse(localStorage.getItem("travels_comparator")) || [];
+        const giaPresente = salvati.some(item => item.id === viaggio.id);
+
+        if (giaPresente) {
+            alert("Questo viaggio è già presente nel comparatore!");
+            return;
+        }
+
+        const nuoviSalvati = [...salvati, viaggio];
+        localStorage.setItem("travels_comparator", JSON.stringify(nuoviSalvati));
+        alert(`${viaggio.title} aggiunto al comparatore!`);
+    };
+
     return (
         <div className="detail-container">
             <Link to="/" className="back-link">← Torna alla Home</Link>
@@ -70,7 +84,7 @@ export default function DetailPage() {
                         </div>
                         <div className="spec-card">
                             <span className="spec-label">Adrenalina</span>
-                            <span className="spec-value">🔥 {viaggio.adrenalineLevel} / 5</span>
+                            <span className="spec-value">⚡️{viaggio.adrenalineLevel} / 5⚡️</span>
                         </div>
                     </div>
 
@@ -85,6 +99,14 @@ export default function DetailPage() {
                         </div>
                     )}
                 </div>
+            </div>
+            <div className="detail-actions">
+                <Link to="/">← Torna alla Home</Link>
+
+                {/* BOTTONE CONFRONTA NEL DETTAGLIO */}
+                <button onClick={aggiungiAlComparatoreDalDettaglio}>
+                    Confronta questo viaggio
+                </button>
             </div>
         </div>
     )
