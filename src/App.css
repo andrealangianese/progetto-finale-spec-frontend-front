@@ -4,34 +4,72 @@
     justify-content: space-between;
     align-items: center;
     background-color: #281313;
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.2rem 2rem;
+    /* Aumentato leggermente il padding verticale per dare respiro */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
+/* CONTENITORE LOGO + SCRITTA */
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    /* Crea uno spazio perfetto tra il mondo e la scritta Langiaroad */
+}
+
+/* L'icona del mondo del logo */
 .navbar-icon {
-    width: 40px;
-    height: 40px;
+    width: 42px;
+    height: 42px;
     object-fit: contain;
-    border-radius: 4p
+    transition: transform 0.3s ease;
+}
+
+/* Effetto carino: se passi il mouse sul logo, il mondo gira leggermente */
+.navbar-logo:hover .navbar-icon {
+    transform: rotate(15deg);
+}
+
+/* LA SCRITTA LANGIAROAD DIVENTATA BELLISSIMA */
+.navbar-logo-text {
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 800;
+    /* Scritta più spessa e importante */
+    font-size: 1.4rem;
+    /* Leggermente più grande per renderla leggibile */
+    letter-spacing: 1px;
+    /* Spazia leggermente le lettere per un look moderno e "travel" */
+    background: linear-gradient(45deg, #ffffff, #00adb5);
+    /* Sfumatura leggera che sfuma nel tuo turchese */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .navbar-links {
     display: flex;
-    gap: 20px;
+    gap: 25px;
+    /* Aumentato il gap tra i link per uniformarli */
+    align-items: center;
 }
 
 .navbar-link {
     color: #ffffff;
     text-decoration: none;
-    font-family: 'Segoe UI', Tahoma;
-    font-weight: 500;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 600;
+    /* Un filo più marcati per l'eleganza */
     font-size: 1rem;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    opacity: 0.85;
+    /* Leggermente opachi di default per far risaltare il logo */
 }
 
+/* Hover sui link della navbar: usiamo il tuo turchese invece del vecchio blu scuro, 
+   così si abbina perfettamente ai pulsanti del sito! */
 .navbar-link:hover {
-    color: #2b4d90;
-
+    color: #00adb5;
+    opacity: 1;
 }
 
 /* Contenitore Principale */

@@ -38,32 +38,19 @@ export default function HomePage() {
 
 
         if (ordinamentoAlfabetico === 'title-asc') {
-            return titoloA.localeCompare(titoloB); // Fa tutto da solo: restituisce -1, 1 o 0 in automatico!
+            return titoloA.localeCompare(titoloB);
         } else if (ordinamentoAlfabetico === 'title-desc') {
-            return titoloB.localeCompare(titoloA); // Al contrario per la Z-A
+            return titoloB.localeCompare(titoloA);
         }
         return 0;
     })
 
-    const aggiungiAlComparatoreDalDettaglio = () => {
-        const salvati = JSON.parse(localStorage.getItem("travels_comparator")) || [];
-        const giaPresente = salvati.some(item => item.id === viaggio.id);
-
-        if (giaPresente) {
-            alert("Questo viaggio è già presente nel comparatore!");
-            return;
-        }
-
-        const nuoviSalvati = [...salvati, viaggio];
-        localStorage.setItem("travels_comparator", JSON.stringify(nuoviSalvati));
-        alert(`${viaggio.title} aggiunto al comparatore!`);
-    };
-
+    // funzione che andrò a richiamare dopo per confrontare viaggi
     const aggiungiAlComparatore = (viaggio) => {
-        // 1. Prendo l'array salvato nel browser (se non c'è nulla, parto da un array vuoto)
+        // prendo l'array salvato nel browser (se non c'è nulla, parto da un array vuoto)
         const salvati = JSON.parse(localStorage.getItem("travels_comparator")) || [];
 
-        // 2. Controllo se questo viaggio è già stato inserito
+        // controllo se questo viaggio è già stato inserito
         const giaPresente = salvati.some(item => item.id === viaggio.id);
 
         if (giaPresente) {
@@ -71,11 +58,32 @@ export default function HomePage() {
             return;
         }
 
-        // 3. Aggiungo il viaggio corrente alla lista e salvo tutto nel browser
+        // aggiungo il viaggio corrente alla lista e salvo tutto nel browser
         const nuoviSalvati = [...salvati, viaggio];
         localStorage.setItem("travels_comparator", JSON.stringify(nuoviSalvati));
         alert(`${viaggio.title} aggiunto al comparatore!`);
     };
+
+    // funzione per gestire i preferiti molto simile a quella sopra
+
+    const aggiungiAiPreferiti = (viaggio) => {
+        // prendo l'array salvato nel browser (se non c'è nulla, parto da un array vuoto)
+        const salvati = JSON.parse(localStorage.getItem("travels_favs")) || [];
+
+        // controllo se questo viaggio è già stato inserito
+        const giaPresente = salvati.some(item => item.id === viaggio.id);
+
+        if (giaPresente) {
+            alert("Questo viaggio è già presente tra i tuoi preferiti!");
+            return;
+        }
+
+        // aggiungo il viaggio corrente alla lista e salvo tutto nel browser
+        const nuoviSalvati = [...salvati, viaggio];
+        localStorage.setItem("travels_favs", JSON.stringify(nuoviSalvati));
+        alert(`${viaggio.title} aggiunto ai tuoi preferiti!!!`);
+    };
+
 
     return (
         <div className="homepage-container">
@@ -137,8 +145,10 @@ export default function HomePage() {
                             </div>
                             {/* bottone per la comparazione dei viaggi*/}
                             <div>
-
-                                <button onClick={() => aggiungiAlComparatore(viaggio)}>
+                                <button onClick={() => aggiungiAiPreferiti(viaggio)} className="travel-card-button" style={{ backgroundColor: 'black', marginLeft: "10px" }}>
+                                    ❤️
+                                </button>
+                                <button onClick={() => aggiungiAlComparatore(viaggio)} style={{ backgroundColor: 'brown', marginLeft: "10px", marginRight: '10px' }}>
                                     Confronta
                                 </button>
                                 <Link to={`/travels/${viaggio.id}`} className="travel-card-button">

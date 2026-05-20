@@ -13,7 +13,7 @@ export default function NavBar() {
                             alt="Logo Viaggi"
                             className="navbar-icon"
                         />
-                        <span className="navbar-link">Langiaroad</span>
+                        <span className="navbar-logo-text">LangiaRoad</span>
                     </Link>
                 </div>
                 <div className="navbar-links">

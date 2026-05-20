@@ -101,8 +101,6 @@ export default function DetailPage() {
                 </div>
             </div>
             <div className="detail-actions">
-                <Link to="/">← Torna alla Home</Link>
-
                 {/* BOTTONE CONFRONTA NEL DETTAGLIO */}
                 <button onClick={aggiungiAlComparatoreDalDettaglio}>
                     Confronta questo viaggio
