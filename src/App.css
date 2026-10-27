@@ -418,6 +418,42 @@
     color: #281313;
 }
 
+/* Stati della lista: conteggio, caricamento, errore */
+.filters-reset {
+    align-self: center;
+}
+
+.results-count {
+    color: #888;
+    font-size: 0.9rem;
+    margin: 0 0 12px 0;
+}
+
+.travels-grid.is-stale {
+    opacity: 0.55;
+    transition: opacity 0.2s;
+}
+
+.travel-card.skeleton {
+    height: 78px;
+    background: linear-gradient(90deg, #f1f3f5 25%, #e9ecef 50%, #f1f3f5 75%);
+    background-size: 200% 100%;
+    animation: skeleton 1.2s infinite linear;
+}
+
+@keyframes skeleton {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+}
+
+.state-box {
+    text-align: center;
+    padding: 40px 20px;
+    background-color: #fff5f5;
+    border-radius: 12px;
+    color: #c92a2a;
+}
+
 /* Tabella di confronto */
 .compare-toolbar {
     display: flex;

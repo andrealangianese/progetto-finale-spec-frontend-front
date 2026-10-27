@@ -1,51 +1,71 @@
 import { useEffect, useState } from "react"
-import { API_URL } from "../lib/api"
+import { useSearchParams } from "react-router-dom"
+import { getTravels } from "../lib/api"
+import useDebouncedValue from "../hooks/useDebouncedValue"
 import TravelCard from "./TravelCard"
 
+const TUTTE = ''
 
 export default function HomePage() {
+    // I filtri vivono nell'URL (?q=surf&category=Surf&sort=title-asc): link condivisibili e back/forward funzionanti
+    const [searchParams, setSearchParams] = useSearchParams()
+    const q = searchParams.get('q') ?? ''
+    const categoria = searchParams.get('category') ?? TUTTE
+    const ordinamento = searchParams.get('sort') ?? ''
 
-    // state per salvare i viaggi
-    const [viaggi, setViaggi] = useState([])
-    // state per ricerca viaggi per nome
-    const [cercaViaggiNome, setCercaViaggiNome] = useState('')
-    // state per ricerca viaggi per categorie
-    const [cercaViaggiCategoria, setCercaViaggiCategoria] = useState('Tutte le categorie')
-    // state per ordinamento da A -> Z
-    const [ordinamentoAlfabetico, setOrdinamentoAlfabetico] = useState('')
+    // Il testo digitato aggiorna l'URL (e quindi la chiamata API) solo dopo 300ms di pausa
+    const [testo, setTesto] = useState(q)
+    const testoDebounced = useDebouncedValue(testo.trim(), 300)
+
+    const aggiornaParam = (chiave, valore) => {
+        setSearchParams(prev => {
+            const next = new URLSearchParams(prev)
+            if (valore) next.set(chiave, valore)
+            else next.delete(chiave)
+            return next
+        }, { replace: true })
+    }
 
     useEffect(() => {
-        fetch(`${API_URL}/travels`)
-            .then(res => res.json())
-            .then(data => setViaggi(data))
-            .catch(error => console.error(error)
-            )
+        if (testoDebounced !== q) aggiornaParam('q', testoDebounced)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [testoDebounced])
+
+    // Categorie: lette una volta dalla lista completa, così la select non si svuota filtrando
+    const [categorie, setCategorie] = useState([])
+    useEffect(() => {
+        const controller = new AbortController()
+        getTravels({}, { signal: controller.signal })
+            .then(data => setCategorie([...new Set(data.map(v => v.category).filter(Boolean))].sort()))
+            .catch(() => { })
+        return () => controller.abort()
     }, [])
 
-    // per evitare di stampare tutte le categorie uguali, set prorprietà di js che non accetta elementi uguali
-    const categorieUniche = ['Tutte le categorie', ...new Set(viaggi.map(viaggio => viaggio.category).filter(Boolean))]
+    // Risultati: la ricerca e il filtro per categoria li fa il backend
+    const chiave = `${q}|${categoria}`
+    const [risultato, setRisultato] = useState({ chiave: null, viaggi: [], errore: null })
+    const [tentativo, setTentativo] = useState(0)
+    const loading = risultato.chiave !== `${chiave}|${tentativo}`
 
-    const viaggiFiltrati = viaggi.filter(viaggio => {
-        const titolo = viaggio.title.toLowerCase()
-        const comparazioneTitolo = titolo.includes(cercaViaggiNome.toLowerCase())
-        const comprazioneCategorie = cercaViaggiCategoria === 'Tutte le categorie' || viaggio.category === cercaViaggiCategoria
-        return comparazioneTitolo && comprazioneCategorie
+    useEffect(() => {
+        const controller = new AbortController()
+        const chiaveRichiesta = `${q}|${categoria}|${tentativo}`
+        getTravels({ search: q, category: categoria }, { signal: controller.signal })
+            .then(viaggi => setRisultato({ chiave: chiaveRichiesta, viaggi, errore: null }))
+            .catch(err => {
+                if (err.name !== 'AbortError') setRisultato({ chiave: chiaveRichiesta, viaggi: [], errore: err.message })
+            })
+        return () => controller.abort()
+    }, [q, categoria, tentativo])
+
+    // ordinamento lato client: il backend non lo supporta
+    const viaggiOrdinati = [...risultato.viaggi].sort((a, b) => {
+        if (ordinamento === 'title-asc') return a.title.localeCompare(b.title, 'it')
+        if (ordinamento === 'title-desc') return b.title.localeCompare(a.title, 'it')
+        return 0
     })
 
-    // controllo ordinamento alfabetico
-    const viaggiOrdinati = [...viaggiFiltrati].sort((a, b) => {
-        // la forza diventare una stringa a togliere gli spazi e farlo diventare minuscolo
-        const titoloA = (a.title || "").toString().trim().toLowerCase();
-        const titoloB = (b.title || "").toString().trim().toLowerCase();
-
-
-        if (ordinamentoAlfabetico === 'title-asc') {
-            return titoloA.localeCompare(titoloB);
-        } else if (ordinamentoAlfabetico === 'title-desc') {
-            return titoloB.localeCompare(titoloA);
-        }
-        return 0;
-    })
+    const filtriAttivi = q || categoria || ordinamento
 
     return (
         <div className="homepage-container">
@@ -53,40 +73,39 @@ export default function HomePage() {
 
             {/* PANNELLO FILTRI */}
             <div className="filters-panel">
-                {/* ricerca per testo */}
                 <div className="filter-group flex-grow">
-                    <label className="filter-label">Cerca per titolo</label>
+                    <label className="filter-label" htmlFor="filtro-titolo">Cerca per titolo</label>
                     <input
-                        type="text"
+                        id="filtro-titolo"
+                        type="search"
                         placeholder="Es: Downhill, Surf..."
-                        onChange={e => setCercaViaggiNome(e.target.value)}
+                        value={testo}
+                        onChange={e => setTesto(e.target.value)}
                         className="filter-input"
                     />
                 </div>
 
-                {/* ricerca per categorie con select */}
                 <div className="filter-group">
-                    <label className="filter-label">Filtra per categoria</label>
+                    <label className="filter-label" htmlFor="filtro-categoria">Filtra per categoria</label>
                     <select
-                        value={cercaViaggiCategoria}
-                        onChange={e => setCercaViaggiCategoria(e.target.value)}
+                        id="filtro-categoria"
+                        value={categoria}
+                        onChange={e => aggiornaParam('category', e.target.value)}
                         className="filter-select"
                     >
-                        {/* stampo tutte le categorie solo una volta */}
-                        {categorieUniche.map((cat, index) => (
-                            <option key={index} value={cat}>
-                                {cat}
-                            </option>
+                        <option value={TUTTE}>Tutte le categorie</option>
+                        {categorie.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
                         ))}
                     </select>
                 </div>
 
-                {/* ordinamento ordine crescente e decrescente */}
                 <div className="filter-group">
-                    <label className="filter-label">Ordina per</label>
+                    <label className="filter-label" htmlFor="filtro-ordine">Ordina per</label>
                     <select
-                        value={ordinamentoAlfabetico}
-                        onChange={e => setOrdinamentoAlfabetico(e.target.value)}
+                        id="filtro-ordine"
+                        value={ordinamento}
+                        onChange={e => aggiornaParam('sort', e.target.value)}
                         className="filter-select"
                     >
                         <option value="">Ordine di Default</option>
@@ -94,18 +113,42 @@ export default function HomePage() {
                         <option value="title-desc">Titoli da Z - A</option>
                     </select>
                 </div>
+
+                {filtriAttivi && (
+                    <button
+                        className="btn-link filters-reset"
+                        onClick={() => { setTesto(''); setSearchParams({}, { replace: true }) }}
+                    >
+                        Azzera filtri
+                    </button>
+                )}
             </div>
 
             {/* lista dei risultati finali */}
-            <div className="travels-grid">
-                {viaggiOrdinati.length > 0 ? (
-                    viaggiOrdinati.map(viaggio => (
-                        <TravelCard key={viaggio.id} viaggio={viaggio} />
-                    ))
-                ) : (
-                    <p className="no-results">Non è stato trovato nulla che corrisponda ai filtri applicati.</p>
-                )}
-            </div>
+            {risultato.errore && !loading ? (
+                <div className="state-box">
+                    <p>Non riusciamo a caricare i viaggi: {risultato.errore}</p>
+                    <button className="travel-card-button" onClick={() => setTentativo(t => t + 1)}>Riprova</button>
+                </div>
+            ) : loading && risultato.chiave === null ? (
+                <div className="travels-grid" aria-busy="true">
+                    {Array.from({ length: 4 }, (_, i) => <div key={i} className="travel-card skeleton" />)}
+                </div>
+            ) : (
+                <>
+                    <p className="results-count" aria-live="polite">
+                        {loading ? 'Ricerca in corso...' : `${viaggiOrdinati.length} viaggi trovati`}
+                    </p>
+                    <div className={`travels-grid ${loading ? 'is-stale' : ''}`}>
+                        {viaggiOrdinati.map(viaggio => (
+                            <TravelCard key={viaggio.id} viaggio={viaggio} />
+                        ))}
+                        {!loading && viaggiOrdinati.length === 0 && (
+                            <p className="no-results">Non è stato trovato nulla che corrisponda ai filtri applicati.</p>
+                        )}
+                    </div>
+                </>
+            )}
         </div>
     )
 }
