@@ -1,16 +1,50 @@
-# React + Vite
+# LangiaRoad — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Comparatore di viaggi d'avventura (progetto finale Boolean) in React 19 + Vite + React Router.
 
-Currently, two official plugins are available:
+Backend: [progetto-finale-spec-frontend-back](https://github.com/andrealangianese/progetto-finale-spec-frontend-back).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Funzionalità
 
-## React Compiler
+- **Home**: ricerca per titolo (lato server, con debounce), filtro per categoria, ordinamento A-Z / Z-A. I filtri sono salvati nell'URL, quindi una ricerca si può condividere con un link.
+- **Dettaglio viaggio**: scheda completa con specifiche ed equipaggiamento.
+- **Preferiti** e **Comparatore** (max 4 viaggi), salvati in `localStorage` e sincronizzati tra le schede del browser.
+- **Comparatore**: tabella affiancata con il valore migliore evidenziato (prezzo, durata, prezzo al giorno).
+- **✨ Trip Matcher**: imposti budget, giorni e adrenalina; ogni viaggio riceve un punteggio di compatibilità con pro e contro, e con un click i top 3 finiscono nel comparatore.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Setup
 
-## Expanding the ESLint configuration
+```bash
+npm install
+npm run dev        # http://localhost:5173
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Il frontend chiama `http://localhost:3001` di default. Per puntare a un altro backend:
+
+```bash
+# .env.local
+VITE_API_URL=https://tuo-backend.vercel.app
+```
+
+## Script
+
+| Comando | Descrizione |
+|---|---|
+| `npm run dev` | Server di sviluppo |
+| `npm run build` | Build di produzione |
+| `npm run lint` | ESLint |
+| `npm test` | Unit test (`node:test`) della logica del Trip Matcher |
+
+## Struttura
+
+```
+src/
+  components/   pagine e componenti UI
+  context/      store condiviso (preferiti/comparatore) e toast
+  hooks/        useLocalStorage, useDebouncedValue
+  lib/          client API e logica di matching
+```
+
+## Deploy
+
+Su Vercel: `vercel.json` riscrive tutte le route su `index.html`, così i deep link (es. `/travels/1`) funzionano anche dopo un refresh.
