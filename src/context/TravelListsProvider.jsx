@@ -43,6 +43,11 @@ export default function TravelListsProvider({ children }) {
 
     const svuotaConfronto = useCallback(() => setConfronto(NESSUNO), [setConfronto])
 
+    // Sostituisce il contenuto del comparatore (es. "confronta i top 3" del Trip Matcher)
+    const impostaConfronto = useCallback((viaggi) => {
+        setConfronto(viaggi.slice(0, MAX_CONFRONTO).map(snapshot))
+    }, [setConfronto])
+
     // Rimuove dal comparatore i viaggi che non esistono più sul backend
     const mantieniSoloInConfronto = useCallback((idsValidi) => {
         setConfronto(prev => prev.filter(v => idsValidi.includes(v.id)))
@@ -51,8 +56,8 @@ export default function TravelListsProvider({ children }) {
     const value = useMemo(() => ({
         preferiti, confronto,
         isPreferito, isInConfronto,
-        togglePreferito, toggleConfronto, svuotaConfronto, mantieniSoloInConfronto,
-    }), [preferiti, confronto, isPreferito, isInConfronto, togglePreferito, toggleConfronto, svuotaConfronto, mantieniSoloInConfronto])
+        togglePreferito, toggleConfronto, svuotaConfronto, mantieniSoloInConfronto, impostaConfronto,
+    }), [preferiti, confronto, isPreferito, isInConfronto, togglePreferito, toggleConfronto, svuotaConfronto, mantieniSoloInConfronto, impostaConfronto])
 
     return <TravelListsContext.Provider value={value}>{children}</TravelListsContext.Provider>
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { useSearchParams } from "react-router-dom"
+import { Link, useSearchParams } from "react-router-dom"
 import { getTravels } from "../lib/api"
 import useDebouncedValue from "../hooks/useDebouncedValue"
 import TravelCard from "./TravelCard"
@@ -70,6 +70,11 @@ export default function HomePage() {
     return (
         <div className="homepage-container">
             <h1 className="homepage-title">I nostri viaggi all'insegna dell'avventura</h1>
+
+            <Link to="/trova-il-tuo-viaggio" className="matcher-cta">
+                <span>✨ Non sai da dove partire? Imposta budget, giorni e adrenalina: troviamo il viaggio giusto per te.</span>
+                <strong>Prova il Trip Matcher →</strong>
+            </Link>
 
             {/* PANNELLO FILTRI */}
             <div className="filters-panel">

@@ -23,6 +23,7 @@ export default function NavBar() {
             </div>
             <div className="navbar-links">
                 <NavLink to='/' end className="navbar-link">Home</NavLink>
+                <NavLink to='/trova-il-tuo-viaggio' className="navbar-link">✨ Trip Matcher</NavLink>
                 <NavLink to='/destinazioni-preferite' className="navbar-link">
                     Destinazioni Preferite <Badge count={preferiti.length} />
                 </NavLink>
