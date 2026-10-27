@@ -1,0 +1,19 @@
+.card {
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.padding-none { padding: 0; overflow: hidden; }
+.padding-md { padding: var(--space-5); }
+.padding-lg { padding: var(--space-8); }
+
+.interactive {
+    transition: transform var(--duration-base) var(--ease-out), box-shadow var(--duration-base);
+}
+
+.interactive:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}

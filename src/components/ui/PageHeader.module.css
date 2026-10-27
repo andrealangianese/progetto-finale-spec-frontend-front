@@ -1,0 +1,32 @@
+.header {
+    margin-bottom: var(--space-8);
+}
+
+.row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+}
+
+.subtitle {
+    margin-top: var(--space-2);
+    color: var(--text-secondary);
+}
+
+.actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+@media (max-width: 576px) {
+    .title {
+        font-size: 1.8rem;
+    }
+}
