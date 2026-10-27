@@ -1,61 +1,115 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTravelLists } from "../context/travelLists";
+import { getTravelsByIds } from "../lib/api";
 
-// URL del backend: da variabile d'ambiente (Vercel), con fallback in locale
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '')
+const formatEuro = (n) => n.toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+
+// Righe della tabella: `best` indica quale valore evidenziare ("min" | "max")
+const RIGHE = [
+    { label: "Categoria", render: v => v.category },
+    { label: "Destinazione", render: v => `📍 ${v.destination}` },
+    { label: "Prezzo", value: v => v.price, best: "min", render: v => formatEuro(v.price) },
+    { label: "Durata", value: v => v.durationDay, best: "max", render: v => `${v.durationDay} giorni` },
+    { label: "Prezzo al giorno", value: v => v.price / v.durationDay, best: "min", render: v => formatEuro(v.price / v.durationDay) },
+    { label: "Difficoltà", render: v => v.difficulty },
+    { label: "Adrenalina", value: v => v.adrenalineLevel, render: v => "⚡".repeat(v.adrenalineLevel) + ` ${v.adrenalineLevel}/5` },
+    { label: "Equipaggiamento", render: v => `${v.requiredEquipment?.length ?? 0} articoli` },
+];
+
+function valoreMigliore(riga, viaggi) {
+    if (!riga.best || viaggi.length < 2) return null;
+    const valori = viaggi.map(riga.value);
+    return riga.best === "min" ? Math.min(...valori) : Math.max(...valori);
+}
 
 export default function ComparePage() {
-    // State per i viaggi
-    const [tuttiIViaggi, setTuttiIViaggi] = useState([]);
+    const { confronto, toggleConfronto, svuotaConfronto, mantieniSoloInConfronto } = useTravelLists();
 
-    // state per confrontare le schede
-    const [schedeInConfronto, setSchedeInConfronto] = useState([]);
+    // Chiave degli id selezionati: quando cambia, ricarico i dettagli
+    const chiave = confronto.map(v => v.id).join(",");
+    const [risultato, setRisultato] = useState({ chiave: "", viaggi: [], errore: null });
+
+    // Riuso i dettagli già caricati: rimuovere un viaggio aggiorna la tabella senza attese
+    const viaggi = confronto.map(c => risultato.viaggi.find(v => v.id === c.id)).filter(Boolean);
+    const loading = viaggi.length < confronto.length && risultato.chiave !== chiave;
+    const errore = risultato.chiave === chiave ? risultato.errore : null;
 
     useEffect(() => {
-        // chiamata per i viaggi
-        fetch(`${API_URL}/travels`)
-            .then((res) => res.json())
-            .then((data) => setTuttiIViaggi(data))
-            .catch((err) => console.error(err));
-
-        // Leggo i viaggi salvati nel localStorage per mostrarli a schermo
-        // uso JSON.parse per trasformare i dati in array o oggetti
-        // li prendo dal local storage
-        const salvati = JSON.parse(localStorage.getItem("travels_comparator")) || [];
-        setSchedeInConfronto(salvati);
-    }, []);
-
-    // Rimuove una singola scheda e aggiorna il localStorage
-    const rimuoviScheda = (idDaRimuovere) => {
-        const filtrate = schedeInConfronto.filter((v) => v.id !== idDaRimuovere);
-        setSchedeInConfronto(filtrate);
-        localStorage.setItem("travels_comparator", JSON.stringify(filtrate));
-    };
+        if (!chiave) return;
+        const controller = new AbortController();
+        getTravelsByIds(chiave.split(","), { signal: controller.signal })
+            .then(viaggi => {
+                const idsTrovati = viaggi.map(v => v.id);
+                if (idsTrovati.length < chiave.split(",").length) {
+                    // la chiave cambierà e partirà un nuovo caricamento coerente
+                    mantieniSoloInConfronto(idsTrovati);
+                    return;
+                }
+                setRisultato({ chiave, viaggi, errore: null });
+            })
+            .catch(err => {
+                if (err.name !== "AbortError") setRisultato({ chiave, viaggi: [], errore: err.message });
+            });
+        return () => controller.abort();
+    }, [chiave, mantieniSoloInConfronto]);
 
     return (
         <div className="compare-page">
             <h1>Comparatore di Viaggi</h1>
-            <Link to="/">← Torna alla Home</Link>
+            <Link to="/" className="back-link">← Torna alla Home</Link>
 
             <h2>Ti accompagneremo nella scelta che fa più al caso tuo</h2>
 
-            {schedeInConfronto.length === 0 ? (
-                <p>Nessun viaggio selezionato per il confronto.</p>
+            {confronto.length === 0 ? (
+                <p className="no-results">
+                    Nessun viaggio selezionato per il confronto. Aggiungine almeno due dalla <Link to="/">Home</Link>.
+                </p>
+            ) : loading ? (
+                <p className="detail-loading">Caricamento del confronto...</p>
+            ) : errore ? (
+                <p className="detail-error">Impossibile caricare il confronto: {errore}</p>
             ) : (
-                <div className="flex-container" style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-                    {schedeInConfronto.map((viaggio) => (
-                        <div key={viaggio.id} className="scheda-confronto" style={{ border: "1px solid #000", padding: "15px", width: "250px" }}>
-                            <button onClick={() => rimuoviScheda(viaggio.id)}>❌ Rimuovi</button>
-
-                            <h3>{viaggio.title}</h3>
-                            <p><strong>Categoria:</strong> {viaggio.category}</p>
-                            <p><strong>Destinazione:</strong> {viaggio.destination || "Vedi nel dettaglio"}</p>
-                            <p><strong>Prezzo:</strong> € {viaggio.price || "Vedi nel dettaglio"}</p>
-                            <p><strong>Durata:</strong> {viaggio.durationDay || "N/D"} giorni</p>
-                            <p><strong>Difficoltà:</strong> {viaggio.difficulty || "N/D"}</p>
-                        </div>
-                    ))}
-                </div>
+                <>
+                    <div className="compare-toolbar">
+                        <span>{viaggi.length} viaggi a confronto · in verde il valore migliore</span>
+                        <button className="btn-link" onClick={svuotaConfronto}>Svuota comparatore</button>
+                    </div>
+                    <div className="compare-table-wrapper">
+                        <table className="compare-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col"></th>
+                                    {viaggi.map(v => (
+                                        <th key={v.id} scope="col">
+                                            <img src={v.image} alt="" className="compare-img" />
+                                            <Link to={`/travels/${v.id}`} className="compare-title">{v.title}</Link>
+                                            <button className="btn-remove" onClick={() => toggleConfronto(v)}>Rimuovi</button>
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {RIGHE.map(riga => {
+                                    const migliore = valoreMigliore(riga, viaggi);
+                                    return (
+                                        <tr key={riga.label}>
+                                            <th scope="row">{riga.label}</th>
+                                            {viaggi.map(v => (
+                                                <td key={v.id} className={migliore !== null && riga.value(v) === migliore ? "is-best" : ""}>
+                                                    {riga.render(v)}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                    {viaggi.length === 1 && (
+                        <p className="no-results">Aggiungi almeno un altro viaggio per vedere le differenze.</p>
+                    )}
+                </>
             )}
         </div>
     );

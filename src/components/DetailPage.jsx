@@ -1,60 +1,40 @@
 import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
+import { getTravel } from "../lib/api"
+import { useTravelLists } from "../context/travelLists"
 
-// URL del backend: da variabile d'ambiente (Vercel), con fallback in locale
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '')
 
 export default function DetailPage() {
 
     // Recupero l'id dall'URL 
     const { id } = useParams()
 
-    // Stato per il singolo viaggio (inizialmente null)
-    const [viaggio, setViaggio] = useState(null)
-    const [loading, setLoading] = useState(true)
+    const { isPreferito, isInConfronto, togglePreferito, toggleConfronto } = useTravelLists()
+
+    // Risultato legato all'id richiesto: se cambia l'id, torna automaticamente in caricamento
+    const [risultato, setRisultato] = useState({ id: null, viaggio: null, errore: null })
+    const loading = risultato.id !== id
 
     useEffect(() => {
-        if (!id || id === "undefined") return;
-
-        const urlDettaglio = `${API_URL}/travels/${id}`;
-
-        fetch(urlDettaglio)
-            .then(res => {
-                if (!res.ok) throw new Error("Il server ha rifiutato l'ID o la rotta non esiste");
-                return res.json();
-            })
-            .then(data => {
-                // Invece di 'setViaggio(data)', salvo direttamente l'oggetto 'travel' che c'è al suo interno
-                if (data.travel) {
-                    setViaggio(data.travel);
-                } else {
-                    setViaggio(data);
-                }
-
-                setLoading(false);
-            })
+        const controller = new AbortController()
+        getTravel(id, { signal: controller.signal })
+            .then(viaggio => setRisultato({ id, viaggio, errore: null }))
             .catch(error => {
-                console.error("Errore durante il caricamento del dettaglio:", error);
-                setLoading(false);
-            });
+                if (error.name === "AbortError") return
+                setRisultato({ id, viaggio: null, errore: error.status === 404 ? "Viaggio non trovato!" : error.message })
+            })
+        return () => controller.abort()
     }, [id]);
 
+    const viaggio = risultato.viaggio
+
     if (loading) return <p className="detail-loading">Caricamento in corso...</p>
-    if (!viaggio) return <p className="detail-error">Viaggio non trovato!</p>
-
-    const aggiungiAlComparatoreDalDettaglio = () => {
-        const salvati = JSON.parse(localStorage.getItem("travels_comparator")) || [];
-        const giaPresente = salvati.some(item => item.id === viaggio.id);
-
-        if (giaPresente) {
-            alert("Questo viaggio è già presente nel comparatore!");
-            return;
-        }
-
-        const nuoviSalvati = [...salvati, viaggio];
-        localStorage.setItem("travels_comparator", JSON.stringify(nuoviSalvati));
-        alert(`${viaggio.title} aggiunto al comparatore!`);
-    };
+    if (!viaggio) return (
+        <div className="detail-container">
+            <p className="detail-error">{risultato.errore}</p>
+            <Link to="/" className="back-link">← Torna alla Home</Link>
+        </div>
+    )
 
     return (
         <div className="detail-container">
@@ -104,9 +84,11 @@ export default function DetailPage() {
                 </div>
             </div>
             <div className="detail-actions">
-                {/* BOTTONE CONFRONTA NEL DETTAGLIO */}
-                <button onClick={aggiungiAlComparatoreDalDettaglio}>
-                    Confronta questo viaggio
+                <button onClick={() => togglePreferito(viaggio)} aria-pressed={isPreferito(viaggio.id)}>
+                    {isPreferito(viaggio.id) ? "❤️ Nei preferiti" : "🤍 Aggiungi ai preferiti"}
+                </button>
+                <button onClick={() => toggleConfronto(viaggio)} aria-pressed={isInConfronto(viaggio.id)}>
+                    {isInConfronto(viaggio.id) ? "✓ Nel confronto" : "Confronta questo viaggio"}
                 </button>
             </div>
         </div>
