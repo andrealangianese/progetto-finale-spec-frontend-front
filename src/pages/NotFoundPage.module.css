@@ -1,0 +1,22 @@
+.page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    text-align: center;
+}
+
+.code {
+    font-size: var(--font-size-display);
+    font-weight: var(--font-weight-black);
+    line-height: 1;
+    color: var(--color-brand-600);
+}
+
+.title {
+    font-size: var(--font-size-2xl);
+}
+
+.text {
+    color: var(--text-secondary);
+}
