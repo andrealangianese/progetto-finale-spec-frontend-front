@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import AppLayout from "./components/layout/AppLayout"
 import HomePage from "./pages/HomePage"
@@ -8,6 +9,9 @@ import TripMatcherPage from "./pages/TripMatcherPage"
 import NotFoundPage from "./pages/NotFoundPage"
 import ToastProvider from "./context/ToastProvider"
 import TravelListsProvider from "./context/TravelListsProvider"
+
+// Guida di stile viva: caricata solo in sviluppo, esclusa dal bundle di produzione
+const DesignSystemPage = import.meta.env.DEV ? lazy(() => import("./pages/DesignSystemPage")) : null
 
 function App() {
 
@@ -22,6 +26,9 @@ function App() {
               <Route path="/destinazioni-preferite" element={<FavouritePage />} />
               <Route path="/comparazione-viaggi" element={<ComparePage />} />
               <Route path="/trova-il-tuo-viaggio" element={<TripMatcherPage />} />
+              {DesignSystemPage && (
+                <Route path="/design-system" element={<Suspense><DesignSystemPage /></Suspense>} />
+              )}
               <Route path="*" element={<NotFoundPage />} />
             </Route>
           </Routes>
