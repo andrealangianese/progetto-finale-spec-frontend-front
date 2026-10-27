@@ -418,63 +418,101 @@
     color: #281313;
 }
 
-/* Contenitore Flex per affiancare le schede vicino */
-.flex-container {
+/* Tabella di confronto */
+.compare-toolbar {
     display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-/* La singola scheda di confronto (Prende lo stile identico alla tua travel-card) */
-.scheda-confronto {
-    display: flex;
-    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
     gap: 12px;
-    padding: 20px;
-    background-color: #ffffff;
-    border: 1px solid #eef0f2;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
-    width: 280px;
-    position: relative;
-}
-
-/* Effetto hover coerente con le tue card della Home */
-.scheda-confronto:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-/* Pulsante Rimuovi posizionato sulla scheda */
-.scheda-confronto button {
-    align-self: flex-end;
-    background-color: #ff6b6b;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-}
-
-.scheda-confronto button:hover {
-    background-color: #fa5252;
-}
-
-/* Uniformiamo i paragrafi interni alle caratteristiche del confronto */
-.scheda-confronto p {
-    margin: 0;
-    font-size: 0.95rem;
-    color: #444;
-    border-bottom: 1px dashed #eef0f2;
-    padding-bottom: 6px;
-}
-
-.scheda-confronto p strong {
+    flex-wrap: wrap;
+    margin-bottom: 16px;
     color: #666;
+    font-size: 0.95rem;
 }
 
-.scheda-confronto h3 {
-    margin: 0;
-    font-size: 1.25rem;
-    color: #222;
+.btn-link {
+    background: none;
+    border: none;
+    color: #e03131;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+}
+
+.compare-table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.compare-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    min-width: 560px;
+}
+
+.compare-table th,
+.compare-table td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid #eef0f2;
+    vertical-align: top;
+}
+
+.compare-table thead th {
+    vertical-align: bottom;
+    width: 25%;
+}
+
+.compare-table tbody th {
+    color: #888;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.compare-table td.is-best {
+    background-color: #ebfbee;
+    color: #2b8a3e;
+    font-weight: 700;
+}
+
+.compare-img {
+    display: block;
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.compare-title {
+    display: block;
+    color: #281313;
+    font-weight: 700;
+    text-decoration: none;
+    margin-bottom: 8px;
+}
+
+.compare-title:hover {
+    color: #00adb5;
+}
+
+.btn-remove {
+    background-color: #ff6b6b;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-remove:hover {
+    background-color: #fa5252;
 }
 
 /* Link attivo + badge contatori nella navbar */

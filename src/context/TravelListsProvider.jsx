@@ -43,11 +43,16 @@ export default function TravelListsProvider({ children }) {
 
     const svuotaConfronto = useCallback(() => setConfronto(NESSUNO), [setConfronto])
 
+    // Rimuove dal comparatore i viaggi che non esistono più sul backend
+    const mantieniSoloInConfronto = useCallback((idsValidi) => {
+        setConfronto(prev => prev.filter(v => idsValidi.includes(v.id)))
+    }, [setConfronto])
+
     const value = useMemo(() => ({
         preferiti, confronto,
         isPreferito, isInConfronto,
-        togglePreferito, toggleConfronto, svuotaConfronto,
-    }), [preferiti, confronto, isPreferito, isInConfronto, togglePreferito, toggleConfronto, svuotaConfronto])
+        togglePreferito, toggleConfronto, svuotaConfronto, mantieniSoloInConfronto,
+    }), [preferiti, confronto, isPreferito, isInConfronto, togglePreferito, toggleConfronto, svuotaConfronto, mantieniSoloInConfronto])
 
     return <TravelListsContext.Provider value={value}>{children}</TravelListsContext.Provider>
 }

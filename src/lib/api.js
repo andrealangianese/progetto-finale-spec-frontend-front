@@ -26,7 +26,11 @@ export async function getTravel(id, options) {
     return data.travel ?? data
 }
 
-// Dettaglio completo di più viaggi in parallelo
-export function getTravelsByIds(ids, options) {
-    return Promise.all(ids.map(id => getTravel(id, options)))
+// Dettaglio completo di più viaggi in parallelo.
+// I viaggi non più esistenti (404) vengono scartati invece di far fallire tutto.
+export async function getTravelsByIds(ids, options) {
+    const results = await Promise.allSettled(ids.map(id => getTravel(id, options)))
+    const rejected = results.find(r => r.status === 'rejected' && r.reason?.status !== 404)
+    if (rejected) throw rejected.reason
+    return results.filter(r => r.status === 'fulfilled').map(r => r.value)
 }
