@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
 import { API_URL } from "../lib/api"
+import { useTravelLists } from "../context/travelLists"
 
 
 export default function DetailPage() {
@@ -11,6 +12,7 @@ export default function DetailPage() {
     // Stato per il singolo viaggio (inizialmente null)
     const [viaggio, setViaggio] = useState(null)
     const [loading, setLoading] = useState(true)
+    const { isPreferito, isInConfronto, togglePreferito, toggleConfronto } = useTravelLists()
 
     useEffect(() => {
         if (!id || id === "undefined") return;
@@ -40,20 +42,6 @@ export default function DetailPage() {
 
     if (loading) return <p className="detail-loading">Caricamento in corso...</p>
     if (!viaggio) return <p className="detail-error">Viaggio non trovato!</p>
-
-    const aggiungiAlComparatoreDalDettaglio = () => {
-        const salvati = JSON.parse(localStorage.getItem("travels_comparator")) || [];
-        const giaPresente = salvati.some(item => item.id === viaggio.id);
-
-        if (giaPresente) {
-            alert("Questo viaggio è già presente nel comparatore!");
-            return;
-        }
-
-        const nuoviSalvati = [...salvati, viaggio];
-        localStorage.setItem("travels_comparator", JSON.stringify(nuoviSalvati));
-        alert(`${viaggio.title} aggiunto al comparatore!`);
-    };
 
     return (
         <div className="detail-container">
@@ -103,9 +91,11 @@ export default function DetailPage() {
                 </div>
             </div>
             <div className="detail-actions">
-                {/* BOTTONE CONFRONTA NEL DETTAGLIO */}
-                <button onClick={aggiungiAlComparatoreDalDettaglio}>
-                    Confronta questo viaggio
+                <button onClick={() => togglePreferito(viaggio)} aria-pressed={isPreferito(viaggio.id)}>
+                    {isPreferito(viaggio.id) ? "❤️ Nei preferiti" : "🤍 Aggiungi ai preferiti"}
+                </button>
+                <button onClick={() => toggleConfronto(viaggio)} aria-pressed={isInConfronto(viaggio.id)}>
+                    {isInConfronto(viaggio.id) ? "✓ Nel confronto" : "Confronta questo viaggio"}
                 </button>
             </div>
         </div>

@@ -477,6 +477,102 @@
     color: #222;
 }
 
+/* Link attivo + badge contatori nella navbar */
+.navbar-link.active {
+    color: #00adb5;
+    opacity: 1;
+}
+
+.navbar-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    margin-left: 4px;
+    border-radius: 10px;
+    background-color: #00adb5;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Azioni della card: preferito, confronto, dettaglio */
+.travel-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.travel-card-actions a.travel-card-button {
+    text-decoration: none;
+}
+
+.travel-card .btn-icon {
+    background-color: #f1f3f5;
+    padding: 8px 12px;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.travel-card .btn-icon:hover,
+.travel-card .btn-icon.is-active {
+    background-color: #ffe3e3;
+}
+
+.travel-card .btn-compare {
+    background-color: #281313;
+}
+
+.travel-card .btn-compare:hover {
+    background-color: #4a2626;
+}
+
+.travel-card .btn-compare.is-active {
+    background-color: #2b8a3e;
+}
+
+.detail-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+/* Toast di notifica (sostituiscono gli alert) */
+.toast-stack {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.toast {
+    padding: 12px 18px;
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+    cursor: pointer;
+    animation: toast-in 0.25s ease-out;
+}
+
+.toast-success { background-color: #2b8a3e; }
+.toast-info { background-color: #281313; }
+.toast-error { background-color: #e03131; }
+
+@keyframes toast-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 @media (max-width: 992px) {
     .detail-layout {
         flex-direction: column;

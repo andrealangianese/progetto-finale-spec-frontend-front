@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { Link } from "react-router-dom"
 import { API_URL } from "../lib/api"
+import TravelCard from "./TravelCard"
 
 
 export default function HomePage() {
@@ -46,46 +46,6 @@ export default function HomePage() {
         }
         return 0;
     })
-
-    // funzione che andrò a richiamare dopo per confrontare viaggi
-    const aggiungiAlComparatore = (viaggio) => {
-        // prendo l'array salvato nel browser (se non c'è nulla, parto da un array vuoto)
-        const salvati = JSON.parse(localStorage.getItem("travels_comparator")) || [];
-
-        // controllo se questo viaggio è già stato inserito
-        const giaPresente = salvati.some(item => item.id === viaggio.id);
-
-        if (giaPresente) {
-            alert("Questo viaggio è già presente nel comparatore!");
-            return;
-        }
-
-        // aggiungo il viaggio corrente alla lista e salvo tutto nel browser
-        const nuoviSalvati = [...salvati, viaggio];
-        localStorage.setItem("travels_comparator", JSON.stringify(nuoviSalvati));
-        alert(`${viaggio.title} aggiunto al comparatore!`);
-    };
-
-    // funzione per gestire i preferiti molto simile a quella sopra
-
-    const aggiungiAiPreferiti = (viaggio) => {
-        // prendo l'array salvato nel browser (se non c'è nulla, parte da un array vuoto)
-        const salvati = JSON.parse(localStorage.getItem("travels_favs")) || [];
-
-        // controllo se questo viaggio è già stato inserito
-        const giaPresente = salvati.some(item => item.id === viaggio.id);
-
-        if (giaPresente) {
-            alert("Questo viaggio è già presente tra i tuoi preferiti!");
-            return;
-        }
-
-        // aggiungo il viaggio corrente alla lista e salvo tutto nel browser
-        const nuoviSalvati = [...salvati, viaggio];
-        localStorage.setItem("travels_favs", JSON.stringify(nuoviSalvati));
-        alert(`${viaggio.title} aggiunto ai tuoi preferiti!!!`);
-    };
-
 
     return (
         <div className="homepage-container">
@@ -139,26 +99,8 @@ export default function HomePage() {
             {/* lista dei risultati finali */}
             <div className="travels-grid">
                 {viaggiOrdinati.length > 0 ? (
-                    viaggiOrdinati.map((viaggio, index) => (
-                        <div key={index} className="travel-card">
-                            <div className="travel-card-content">
-                                <h3 className="travel-card-title">{viaggio.title}</h3>
-                                <span className="travel-card-category">{viaggio.category}</span>
-                            </div>
-                            {/* bottone per la comparazione dei viaggi*/}
-                            <div>
-                                <button onClick={() => aggiungiAiPreferiti(viaggio)} className="travel-card-button" style={{ backgroundColor: 'black', marginLeft: "10px" }}>
-                                    ❤️
-                                </button>
-                                <button onClick={() => aggiungiAlComparatore(viaggio)} style={{ backgroundColor: 'brown', marginLeft: "10px", marginRight: '10px' }}>
-                                    Confronta
-                                </button>
-                                <Link to={`/travels/${viaggio.id}`} className="travel-card-button">
-                                    Dettagli del Viaggio
-                                </Link>
-                            </div>
-
-                        </div>
+                    viaggiOrdinati.map(viaggio => (
+                        <TravelCard key={viaggio.id} viaggio={viaggio} />
                     ))
                 ) : (
                     <p className="no-results">Non è stato trovato nulla che corrisponda ai filtri applicati.</p>
