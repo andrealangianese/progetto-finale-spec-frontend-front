@@ -1,14 +1,17 @@
+import { lazy, Suspense } from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import HomePage from "./components/HomePage"
-import NavBar from "./components/NavBar"
-import DetailPage from "./components/DetailPage"
-import FavouritePage from "./components/FavouritePage"
-import ComparePage from "./components/ComparePage"
-import NotFoundPage from "./components/NotFoundPage"
-import TripMatcherPage from "./components/TripMatcherPage"
+import AppLayout from "./components/layout/AppLayout"
+import HomePage from "./pages/HomePage"
+import DetailPage from "./pages/DetailPage"
+import FavouritePage from "./pages/FavouritePage"
+import ComparePage from "./pages/ComparePage"
+import TripMatcherPage from "./pages/TripMatcherPage"
+import NotFoundPage from "./pages/NotFoundPage"
 import ToastProvider from "./context/ToastProvider"
 import TravelListsProvider from "./context/TravelListsProvider"
-import "./App.css"
+
+// Guida di stile viva: caricata solo in sviluppo, esclusa dal bundle di produzione
+const DesignSystemPage = import.meta.env.DEV ? lazy(() => import("./pages/DesignSystemPage")) : null
 
 function App() {
 
@@ -16,14 +19,18 @@ function App() {
     <ToastProvider>
       <TravelListsProvider>
         <BrowserRouter>
-          <NavBar />
           <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/travels/:id" element={<DetailPage />} />
-            <Route path="/destinazioni-preferite" element={<FavouritePage />} />
-            <Route path="/comparazione-viaggi" element={<ComparePage />} />
-            <Route path="/trova-il-tuo-viaggio" element={<TripMatcherPage />} />
-            <Route path="*" element={<NotFoundPage />} />
+            <Route element={<AppLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/travels/:id" element={<DetailPage />} />
+              <Route path="/destinazioni-preferite" element={<FavouritePage />} />
+              <Route path="/comparazione-viaggi" element={<ComparePage />} />
+              <Route path="/trova-il-tuo-viaggio" element={<TripMatcherPage />} />
+              {DesignSystemPage && (
+                <Route path="/design-system" element={<Suspense><DesignSystemPage /></Suspense>} />
+              )}
+              <Route path="*" element={<NotFoundPage />} />
+            </Route>
           </Routes>
         </BrowserRouter>
       </TravelListsProvider>

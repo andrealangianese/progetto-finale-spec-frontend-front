@@ -1,0 +1,13 @@
+.container {
+    margin: 0 auto;
+    padding: var(--space-10) var(--space-5);
+}
+
+.md { max-width: 1000px; }
+.lg { max-width: var(--container-max); }
+
+@media (max-width: 576px) {
+    .container {
+        padding: var(--space-6) var(--space-4);
+    }
+}

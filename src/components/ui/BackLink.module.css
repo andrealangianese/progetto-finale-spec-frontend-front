@@ -1,0 +1,12 @@
+.back {
+    display: inline-flex;
+    gap: var(--space-1);
+    margin-bottom: var(--space-4);
+    color: var(--text-link);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: none;
+}
+
+.back:hover {
+    text-decoration: underline;
+}

@@ -2,11 +2,21 @@ import { useEffect, useState } from "react"
 import { Link, useSearchParams } from "react-router-dom"
 import { getTravels } from "../lib/api"
 import useDebouncedValue from "../hooks/useDebouncedValue"
-import TravelCard from "./TravelCard"
+import useDocumentTitle from "../hooks/useDocumentTitle"
+import TravelCard from "../components/travel/TravelCard"
+import { Button, Container, EmptyState, ErrorState, PageHeader, SelectField, Skeleton, TextField } from "../components/ui"
+import styles from "./HomePage.module.css"
 
 const TUTTE = ''
 
+const OPZIONI_ORDINAMENTO = [
+    { value: '', label: 'Ordine di Default' },
+    { value: 'title-asc', label: 'Titoli da A - Z' },
+    { value: 'title-desc', label: 'Titoli da Z - A' },
+]
+
 export default function HomePage() {
+    useDocumentTitle('Viaggi d\'avventura')
     // I filtri vivono nell'URL (?q=surf&category=Surf&sort=title-asc): link condivisibili e back/forward funzionanti
     const [searchParams, setSearchParams] = useSearchParams()
     const q = searchParams.get('q') ?? ''
@@ -68,92 +78,65 @@ export default function HomePage() {
     const filtriAttivi = q || categoria || ordinamento
 
     return (
-        <div className="homepage-container">
-            <h1 className="homepage-title">I nostri viaggi all'insegna dell'avventura</h1>
+        <Container>
+            <PageHeader title="I nostri viaggi all'insegna dell'avventura" />
 
-            <Link to="/trova-il-tuo-viaggio" className="matcher-cta">
+            <Link to="/trova-il-tuo-viaggio" className={styles.cta}>
                 <span>✨ Non sai da dove partire? Imposta budget, giorni e adrenalina: troviamo il viaggio giusto per te.</span>
-                <strong>Prova il Trip Matcher →</strong>
+                <strong>Prova il Trip Matcher <span aria-hidden="true">→</span></strong>
             </Link>
 
-            {/* PANNELLO FILTRI */}
-            <div className="filters-panel">
-                <div className="filter-group flex-grow">
-                    <label className="filter-label" htmlFor="filtro-titolo">Cerca per titolo</label>
-                    <input
-                        id="filtro-titolo"
-                        type="search"
-                        placeholder="Es: Downhill, Surf..."
-                        value={testo}
-                        onChange={e => setTesto(e.target.value)}
-                        className="filter-input"
-                    />
-                </div>
-
-                <div className="filter-group">
-                    <label className="filter-label" htmlFor="filtro-categoria">Filtra per categoria</label>
-                    <select
-                        id="filtro-categoria"
-                        value={categoria}
-                        onChange={e => aggiornaParam('category', e.target.value)}
-                        className="filter-select"
-                    >
-                        <option value={TUTTE}>Tutte le categorie</option>
-                        {categorie.map(cat => (
-                            <option key={cat} value={cat}>{cat}</option>
-                        ))}
-                    </select>
-                </div>
-
-                <div className="filter-group">
-                    <label className="filter-label" htmlFor="filtro-ordine">Ordina per</label>
-                    <select
-                        id="filtro-ordine"
-                        value={ordinamento}
-                        onChange={e => aggiornaParam('sort', e.target.value)}
-                        className="filter-select"
-                    >
-                        <option value="">Ordine di Default</option>
-                        <option value="title-asc">Titoli da A - Z</option>
-                        <option value="title-desc">Titoli da Z - A</option>
-                    </select>
-                </div>
-
+            <form role="search" className={styles.filters} aria-label="Filtra i viaggi" onSubmit={e => e.preventDefault()}>
+                <TextField
+                    label="Cerca per titolo"
+                    type="search"
+                    placeholder="Es: Downhill, Surf..."
+                    value={testo}
+                    onChange={e => setTesto(e.target.value)}
+                    grow
+                />
+                <SelectField
+                    label="Filtra per categoria"
+                    value={categoria}
+                    onChange={e => aggiornaParam('category', e.target.value)}
+                    options={[{ value: TUTTE, label: 'Tutte le categorie' }, ...categorie.map(c => ({ value: c, label: c }))]}
+                />
+                <SelectField
+                    label="Ordina per"
+                    value={ordinamento}
+                    onChange={e => aggiornaParam('sort', e.target.value)}
+                    options={OPZIONI_ORDINAMENTO}
+                />
                 {filtriAttivi && (
-                    <button
-                        className="btn-link filters-reset"
-                        onClick={() => { setTesto(''); setSearchParams({}, { replace: true }) }}
-                    >
+                    <Button variant="ghost" onClick={() => { setTesto(''); setSearchParams({}, { replace: true }) }}>
                         Azzera filtri
-                    </button>
+                    </Button>
                 )}
-            </div>
+            </form>
 
-            {/* lista dei risultati finali */}
             {risultato.errore && !loading ? (
-                <div className="state-box">
-                    <p>Non riusciamo a caricare i viaggi: {risultato.errore}</p>
-                    <button className="travel-card-button" onClick={() => setTentativo(t => t + 1)}>Riprova</button>
-                </div>
+                <ErrorState title="Non riusciamo a caricare i viaggi" onRetry={() => setTentativo(t => t + 1)}>
+                    {risultato.errore}
+                </ErrorState>
             ) : loading && risultato.chiave === null ? (
-                <div className="travels-grid" aria-busy="true">
-                    {Array.from({ length: 4 }, (_, i) => <div key={i} className="travel-card skeleton" />)}
-                </div>
+                <Skeleton count={4} />
             ) : (
-                <>
-                    <p className="results-count" aria-live="polite">
+                <section aria-labelledby="titolo-risultati">
+                    <h2 id="titolo-risultati" className={styles.count} aria-live="polite">
                         {loading ? 'Ricerca in corso...' : `${viaggiOrdinati.length} viaggi trovati`}
-                    </p>
-                    <div className={`travels-grid ${loading ? 'is-stale' : ''}`}>
+                    </h2>
+                    <div className={`${styles.list} ${loading ? styles.stale : ''}`} aria-busy={loading}>
                         {viaggiOrdinati.map(viaggio => (
-                            <TravelCard key={viaggio.id} viaggio={viaggio} />
+                            <TravelCard key={viaggio.id} viaggio={viaggio} headingLevel={3} />
                         ))}
                         {!loading && viaggiOrdinati.length === 0 && (
-                            <p className="no-results">Non è stato trovato nulla che corrisponda ai filtri applicati.</p>
+                            <EmptyState icon="🧭" title="Nessun viaggio trovato">
+                                Prova a cambiare i filtri o azzerali per vedere tutti i viaggi.
+                            </EmptyState>
                         )}
                     </div>
-                </>
+                </section>
             )}
-        </div>
+        </Container>
     )
 }

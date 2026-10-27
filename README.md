@@ -39,11 +39,21 @@ VITE_API_URL=https://tuo-backend.vercel.app
 
 ```
 src/
-  components/   pagine e componenti UI
-  context/      store condiviso (preferiti/comparatore) e toast
-  hooks/        useLocalStorage, useDebouncedValue
-  lib/          client API e logica di matching
+  pages/              pagine (una per route)
+  components/ui/      design system: componenti generici riutilizzabili
+  components/layout/  AppLayout (skip link, landmark, focus) e NavBar
+  components/travel/  componenti di dominio (TravelCard)
+  context/            store condiviso (preferiti/comparatore) e toast
+  hooks/              useLocalStorage, useDebouncedValue, useDocumentTitle
+  lib/                client API, formattazione e logica di matching
+  styles/             design token e stili base
 ```
+
+## Design system e accessibilità
+
+Token, componenti e checklist di accessibilità sono in [`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md). In sviluppo la guida di stile viva è su `/design-system`.
+
+Target: WCAG 2.1 AA, verificato con axe-core (0 violazioni).
 
 ## Deploy
 

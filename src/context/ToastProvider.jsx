@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from "react"
 import { ToastContext } from "./toast"
+import styles from "./Toast.module.css"
 
 const DURATA_TOAST = 3000
 
@@ -22,10 +23,14 @@ export default function ToastProvider({ children }) {
     return (
         <ToastContext.Provider value={value}>
             {children}
-            <div className="toast-stack" role="status" aria-live="polite">
+            {/* Regione live sempre presente nel DOM: i messaggi inseriti vengono annunciati */}
+            <div className={styles.stack} role="status" aria-live="polite">
                 {toasts.map(t => (
-                    <div key={t.id} className={`toast toast-${t.type}`} onClick={() => chiudi(t.id)}>
-                        {t.message}
+                    <div key={t.id} className={`${styles.toast} ${styles[t.type]}`}>
+                        <span>{t.message}</span>
+                        <button type="button" className={styles.close} onClick={() => chiudi(t.id)} aria-label="Chiudi notifica">
+                            ×
+                        </button>
                     </div>
                 ))}
             </div>

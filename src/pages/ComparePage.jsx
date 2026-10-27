@@ -2,18 +2,20 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTravelLists } from "../context/travelLists";
 import { getTravelsByIds } from "../lib/api";
-
-const formatEuro = (n) => n.toLocaleString("it-IT", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+import { formatAdrenalina, formatEuro, formatGiorni } from "../lib/format";
+import useDocumentTitle from "../hooks/useDocumentTitle";
+import { Button, Container, EmptyState, ErrorState, LoadingState, PageHeader } from "../components/ui";
+import styles from "./ComparePage.module.css";
 
 // Righe della tabella: `best` indica quale valore evidenziare ("min" | "max")
 const RIGHE = [
     { label: "Categoria", render: v => v.category },
     { label: "Destinazione", render: v => `📍 ${v.destination}` },
     { label: "Prezzo", value: v => v.price, best: "min", render: v => formatEuro(v.price) },
-    { label: "Durata", value: v => v.durationDay, best: "max", render: v => `${v.durationDay} giorni` },
+    { label: "Durata", value: v => v.durationDay, best: "max", render: v => formatGiorni(v.durationDay) },
     { label: "Prezzo al giorno", value: v => v.price / v.durationDay, best: "min", render: v => formatEuro(v.price / v.durationDay) },
     { label: "Difficoltà", render: v => v.difficulty },
-    { label: "Adrenalina", value: v => v.adrenalineLevel, render: v => "⚡".repeat(v.adrenalineLevel) + ` ${v.adrenalineLevel}/5` },
+    { label: "Adrenalina", value: v => v.adrenalineLevel, render: v => formatAdrenalina(v.adrenalineLevel) },
     { label: "Equipaggiamento", render: v => `${v.requiredEquipment?.length ?? 0} articoli` },
 ];
 
@@ -24,6 +26,7 @@ function valoreMigliore(riga, viaggi) {
 }
 
 export default function ComparePage() {
+    useDocumentTitle("Comparatore");
     const { confronto, toggleConfronto, svuotaConfronto, mantieniSoloInConfronto } = useTravelLists();
 
     // Chiave degli id selezionati: quando cambia, ricarico i dettagli
@@ -55,36 +58,45 @@ export default function ComparePage() {
     }, [chiave, mantieniSoloInConfronto]);
 
     return (
-        <div className="compare-page">
-            <h1>Comparatore di Viaggi</h1>
-            <Link to="/" className="back-link">← Torna alla Home</Link>
-
-            <h2>Ti accompagneremo nella scelta che fa più al caso tuo</h2>
+        <Container size="lg">
+            <PageHeader
+                title="Comparatore di Viaggi"
+                subtitle="Ti accompagneremo nella scelta che fa più al caso tuo"
+                backTo="/"
+                actions={viaggi.length > 0 && (
+                    <Button variant="danger" size="sm" onClick={svuotaConfronto}>Svuota comparatore</Button>
+                )}
+            />
 
             {confronto.length === 0 ? (
-                <p className="no-results">
-                    Nessun viaggio selezionato per il confronto. Aggiungine almeno due dalla <Link to="/">Home</Link>.
-                </p>
+                <EmptyState
+                    icon="⚖️"
+                    title="Nessun viaggio da confrontare"
+                    action={<Button to="/">Scegli i viaggi</Button>}
+                >
+                    Aggiungine almeno due dalla Home o lascia scegliere al Trip Matcher.
+                </EmptyState>
             ) : loading ? (
-                <p className="detail-loading">Caricamento del confronto...</p>
+                <LoadingState label="Caricamento del confronto..." />
             ) : errore ? (
-                <p className="detail-error">Impossibile caricare il confronto: {errore}</p>
+                <ErrorState title="Impossibile caricare il confronto">{errore}</ErrorState>
             ) : (
                 <>
-                    <div className="compare-toolbar">
-                        <span>{viaggi.length} viaggi a confronto · in verde il valore migliore</span>
-                        <button className="btn-link" onClick={svuotaConfronto}>Svuota comparatore</button>
-                    </div>
-                    <div className="compare-table-wrapper">
-                        <table className="compare-table">
+                    <div className={styles.tableWrapper} tabIndex={0} role="region" aria-labelledby="caption-confronto">
+                        <table className={styles.table}>
+                            <caption id="caption-confronto" className={styles.caption}>
+                                {viaggi.length} viaggi a confronto · <span aria-hidden="true">★</span> valore migliore
+                            </caption>
                             <thead>
                                 <tr>
-                                    <th scope="col"></th>
+                                    <td className={styles.corner} />
                                     {viaggi.map(v => (
-                                        <th key={v.id} scope="col">
-                                            <img src={v.image} alt="" className="compare-img" />
-                                            <Link to={`/travels/${v.id}`} className="compare-title">{v.title}</Link>
-                                            <button className="btn-remove" onClick={() => toggleConfronto(v)}>Rimuovi</button>
+                                        <th key={v.id} scope="col" className={styles.colHead}>
+                                            <img src={v.image} alt="" className={styles.img} />
+                                            <Link to={`/travels/${v.id}`} className={styles.colTitle}>{v.title}</Link>
+                                            <Button variant="danger" size="sm" onClick={() => toggleConfronto(v)}>
+                                                Rimuovi<span className="sr-only"> {v.title}</span>
+                                            </Button>
                                         </th>
                                     ))}
                                 </tr>
@@ -94,12 +106,16 @@ export default function ComparePage() {
                                     const migliore = valoreMigliore(riga, viaggi);
                                     return (
                                         <tr key={riga.label}>
-                                            <th scope="row">{riga.label}</th>
-                                            {viaggi.map(v => (
-                                                <td key={v.id} className={migliore !== null && riga.value(v) === migliore ? "is-best" : ""}>
-                                                    {riga.render(v)}
-                                                </td>
-                                            ))}
+                                            <th scope="row" className={styles.rowHead}>{riga.label}</th>
+                                            {viaggi.map(v => {
+                                                const isBest = migliore !== null && riga.value(v) === migliore;
+                                                return (
+                                                    <td key={v.id} className={isBest ? styles.best : undefined}>
+                                                        {riga.render(v)}
+                                                        {isBest && <> <span aria-hidden="true">★</span><span className="sr-only">(migliore)</span></>}
+                                                    </td>
+                                                );
+                                            })}
                                         </tr>
                                     );
                                 })}
@@ -107,10 +123,10 @@ export default function ComparePage() {
                         </table>
                     </div>
                     {viaggi.length === 1 && (
-                        <p className="no-results">Aggiungi almeno un altro viaggio per vedere le differenze.</p>
+                        <p className={styles.hint}>Aggiungi almeno un altro viaggio per vedere le differenze.</p>
                     )}
                 </>
             )}
-        </div>
+        </Container>
     );
 }
