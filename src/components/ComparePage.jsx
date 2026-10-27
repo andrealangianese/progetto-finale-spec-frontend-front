@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
+// URL del backend: da variabile d'ambiente (Vercel), con fallback in locale
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '')
+
 export default function ComparePage() {
     // State per i viaggi
     const [tuttiIViaggi, setTuttiIViaggi] = useState([]);
@@ -10,7 +13,7 @@ export default function ComparePage() {
 
     useEffect(() => {
         // chiamata per i viaggi
-        fetch("http://localhost:3001/travels")
+        fetch(`${API_URL}/travels`)
             .then((res) => res.json())
             .then((data) => setTuttiIViaggi(data))
             .catch((err) => console.error(err));

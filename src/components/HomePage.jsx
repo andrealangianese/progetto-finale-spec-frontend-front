@@ -1,5 +1,8 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+
+// URL del backend: da variabile d'ambiente (Vercel), con fallback in locale
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '')
 
 export default function HomePage() {
 
@@ -13,7 +16,7 @@ export default function HomePage() {
     const [ordinamentoAlfabetico, setOrdinamentoAlfabetico] = useState('')
 
     useEffect(() => {
-        fetch('http://localhost:3001/travels')
+        fetch(`${API_URL}/travels`)
             .then(res => res.json())
             .then(data => setViaggi(data))
             .catch(error => console.error(error)
@@ -67,7 +70,7 @@ export default function HomePage() {
     // funzione per gestire i preferiti molto simile a quella sopra
 
     const aggiungiAiPreferiti = (viaggio) => {
-        // prendo l'array salvato nel browser (se non c'è nulla, parto da un array vuoto)
+        // prendo l'array salvato nel browser (se non c'è nulla, parte da un array vuoto)
         const salvati = JSON.parse(localStorage.getItem("travels_favs")) || [];
 
         // controllo se questo viaggio è già stato inserito
@@ -165,4 +168,3 @@ export default function HomePage() {
         </div>
     )
 }
-

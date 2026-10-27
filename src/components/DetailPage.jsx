@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
 
+// URL del backend: da variabile d'ambiente (Vercel), con fallback in locale
+const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '')
+
 export default function DetailPage() {
 
     // Recupero l'id dall'URL 
@@ -13,7 +16,7 @@ export default function DetailPage() {
     useEffect(() => {
         if (!id || id === "undefined") return;
 
-        const urlDettaglio = `http://localhost:3001/travels/${id}`;
+        const urlDettaglio = `${API_URL}/travels/${id}`;
 
         fetch(urlDettaglio)
             .then(res => {
