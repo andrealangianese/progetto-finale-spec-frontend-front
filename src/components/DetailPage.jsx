@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
-import { API_URL } from "../lib/api"
+import { getTravel } from "../lib/api"
 import { useTravelLists } from "../context/travelLists"
 
 
@@ -9,39 +9,32 @@ export default function DetailPage() {
     // Recupero l'id dall'URL 
     const { id } = useParams()
 
-    // Stato per il singolo viaggio (inizialmente null)
-    const [viaggio, setViaggio] = useState(null)
-    const [loading, setLoading] = useState(true)
     const { isPreferito, isInConfronto, togglePreferito, toggleConfronto } = useTravelLists()
 
+    // Risultato legato all'id richiesto: se cambia l'id, torna automaticamente in caricamento
+    const [risultato, setRisultato] = useState({ id: null, viaggio: null, errore: null })
+    const loading = risultato.id !== id
+
     useEffect(() => {
-        if (!id || id === "undefined") return;
-
-        const urlDettaglio = `${API_URL}/travels/${id}`;
-
-        fetch(urlDettaglio)
-            .then(res => {
-                if (!res.ok) throw new Error("Il server ha rifiutato l'ID o la rotta non esiste");
-                return res.json();
-            })
-            .then(data => {
-                // Invece di 'setViaggio(data)', salvo direttamente l'oggetto 'travel' che c'è al suo interno
-                if (data.travel) {
-                    setViaggio(data.travel);
-                } else {
-                    setViaggio(data);
-                }
-
-                setLoading(false);
-            })
+        const controller = new AbortController()
+        getTravel(id, { signal: controller.signal })
+            .then(viaggio => setRisultato({ id, viaggio, errore: null }))
             .catch(error => {
-                console.error("Errore durante il caricamento del dettaglio:", error);
-                setLoading(false);
-            });
+                if (error.name === "AbortError") return
+                setRisultato({ id, viaggio: null, errore: error.status === 404 ? "Viaggio non trovato!" : error.message })
+            })
+        return () => controller.abort()
     }, [id]);
 
+    const viaggio = risultato.viaggio
+
     if (loading) return <p className="detail-loading">Caricamento in corso...</p>
-    if (!viaggio) return <p className="detail-error">Viaggio non trovato!</p>
+    if (!viaggio) return (
+        <div className="detail-container">
+            <p className="detail-error">{risultato.errore}</p>
+            <Link to="/" className="back-link">← Torna alla Home</Link>
+        </div>
+    )
 
     return (
         <div className="detail-container">

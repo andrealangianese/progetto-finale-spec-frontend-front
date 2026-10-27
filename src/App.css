@@ -418,6 +418,32 @@
     color: #281313;
 }
 
+/* Logo senza sottolineatura */
+.navbar-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+}
+
+/* Pagina 404 */
+.not-found {
+    text-align: center;
+}
+
+.not-found-code {
+    font-size: 5rem;
+    font-weight: 800;
+    color: #00adb5;
+    margin: 0;
+}
+
+.not-found .travel-card-button {
+    display: inline-block;
+    margin-top: 20px;
+    text-decoration: none;
+}
+
 /* Stati della lista: conteggio, caricamento, errore */
 .filters-reset {
     align-self: center;
