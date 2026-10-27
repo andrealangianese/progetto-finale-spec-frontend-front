@@ -1,8 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { API_URL } from "../lib/api";
 
-// URL del backend: da variabile d'ambiente (Vercel), con fallback in locale
-const API_URL = (import.meta.env.VITE_API_URL || 'http://localhost:3001').replace(/\/$/, '')
 
 export default function ComparePage() {
     // State per i viaggi
