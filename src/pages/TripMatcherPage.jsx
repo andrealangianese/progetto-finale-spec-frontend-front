@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
-import { getTravels, getTravelsByIds } from "../lib/api"
+import { getAllTravels } from "../lib/api"
 import { classificaViaggi, PREFERENZE_DEFAULT } from "../lib/matcher"
 import { formatEuro, formatGiorni } from "../lib/format"
 import useLocalStorage from "../hooks/useLocalStorage"
@@ -28,8 +28,7 @@ export default function TripMatcherPage() {
     useEffect(() => {
         const controller = new AbortController()
         const options = { signal: controller.signal }
-        getTravels({}, options)
-            .then(lista => getTravelsByIds(lista.map(v => v.id), options))
+        getAllTravels(options)
             .then(viaggi => setStato({ viaggi, loading: false, errore: null }))
             .catch(err => {
                 if (err.name !== "AbortError") setStato({ viaggi: [], loading: false, errore: err.message })

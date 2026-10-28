@@ -4,6 +4,7 @@ import { getTravel } from "../lib/api"
 import { formatAdrenalina, formatEuro, formatGiorni } from "../lib/format"
 import { useTravelLists } from "../context/travelLists"
 import useDocumentTitle from "../hooks/useDocumentTitle"
+import SimilarTravels from "../components/travel/SimilarTravels"
 import { BackLink, Badge, Button, Container, ErrorState, LoadingState, StatCard, StatGrid } from "../components/ui"
 import styles from "./DetailPage.module.css"
 
@@ -82,6 +83,8 @@ export default function DetailPage() {
                     </div>
                 </div>
             </article>
+
+            <SimilarTravels travelId={viaggio.id} />
         </Container>
     )
 }

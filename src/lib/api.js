@@ -26,11 +26,26 @@ export async function getTravel(id, options) {
     return data.travel ?? data
 }
 
-// Dettaglio completo di più viaggi in parallelo.
-// I viaggi non più esistenti (404) vengono scartati invece di far fallire tutto.
-export async function getTravelsByIds(ids, options) {
-    const results = await Promise.allSettled(ids.map(id => getTravel(id, options)))
-    const rejected = results.find(r => r.status === 'rejected' && r.reason?.status !== 404)
-    if (rejected) throw rejected.reason
-    return results.filter(r => r.status === 'fulfilled').map(r => r.value)
+// Dettaglio completo di più viaggi con una sola chiamata (?ids=&fields=*).
+// I viaggi non più esistenti semplicemente non tornano: il chiamante confronta gli id.
+export function getTravelsByIds(ids, options) {
+    if (ids.length === 0) return Promise.resolve([])
+    const params = new URLSearchParams({ ids: ids.join(','), fields: '*' })
+    return request(`/travels?${params}`, options)
+}
+
+// Tutti i viaggi con tutti i campi, in una chiamata (usato dal Trip Matcher)
+export function getAllTravels(options) {
+    return request('/travels?fields=*', options)
+}
+
+// Categorie e range numerici (min/max) senza scaricare la lista
+export async function getTravelsMeta(options) {
+    const data = await request('/travels/meta', options)
+    return data.meta
+}
+
+// Viaggi simili: stessa categoria prima, poi i più vicini per prezzo/durata/adrenalina
+export function getSimilarTravels(id, { limit = 3 } = {}, options) {
+    return request(`/travels/${id}/similar?limit=${limit}`, options)
 }

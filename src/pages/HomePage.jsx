@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Link, useSearchParams } from "react-router-dom"
-import { getTravels } from "../lib/api"
+import { getTravels, getTravelsMeta } from "../lib/api"
 import useDebouncedValue from "../hooks/useDebouncedValue"
 import useDocumentTitle from "../hooks/useDocumentTitle"
 import TravelCard from "../components/travel/TravelCard"
@@ -41,12 +41,12 @@ export default function HomePage() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [testoDebounced])
 
-    // Categorie: lette una volta dalla lista completa, così la select non si svuota filtrando
+    // Categorie da /travels/meta: lette una volta, così la select non si svuota filtrando
     const [categorie, setCategorie] = useState([])
     useEffect(() => {
         const controller = new AbortController()
-        getTravels({}, { signal: controller.signal })
-            .then(data => setCategorie([...new Set(data.map(v => v.category).filter(Boolean))].sort()))
+        getTravelsMeta({ signal: controller.signal })
+            .then(meta => setCategorie(meta.categories))
             .catch(() => { })
         return () => controller.abort()
     }, [])
