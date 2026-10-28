@@ -36,7 +36,9 @@ Usa sempre gli **alias di ruolo** (`--text-secondary`, `--surface-muted`, ...) p
 
 ## Componenti
 
-Importa sempre dal barrel: `import { Button, Card } from "../components/ui"`.
+Importa sempre dal barrel: `import { Button, Card } from "../components/ui"`. Da lì arrivano anche i tipi pubblici: `ButtonProps`, `ButtonVariant`, `ButtonSize`, `BadgeTone`, `SelectOption`.
+
+Le props sono tipizzate, quindi l'editor suggerisce le varianti e TypeScript segnala gli usi sbagliati. Per esempio `Button` con `to` diventa un link e non accetta `pressed`; `RangeField` richiede `valueLabel`, che diventa anche `aria-valuetext`.
 
 | Componente | Uso | Props principali |
 |---|---|---|
