@@ -44,3 +44,8 @@ export async function getTravelsMeta(options) {
     const data = await request('/travels/meta', options)
     return data.meta
 }
+
+// Viaggi simili: stessa categoria prima, poi i più vicini per prezzo/durata/adrenalina
+export function getSimilarTravels(id, { limit = 3 } = {}, options) {
+    return request(`/travels/${id}/similar?limit=${limit}`, options)
+}
