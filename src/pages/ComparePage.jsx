@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useTravelLists } from "../context/travelLists";
 import { getTravelsByIds } from "../lib/api";
@@ -38,16 +38,22 @@ export default function ComparePage() {
     const loading = viaggi.length < confronto.length && risultato.chiave !== chiave;
     const errore = risultato.chiave === chiave ? risultato.errore : null;
 
+    // Id di cui ho già i dettagli: rimuovere viaggi (o ripulire id inesistenti) non richiede chiamate
+    const idsCaricati = useRef(new Set());
+
     useEffect(() => {
         if (!chiave) return;
+        if (chiave.split(",").every(id => idsCaricati.current.has(Number(id)))) return;
         const controller = new AbortController();
         getTravelsByIds(chiave.split(","), { signal: controller.signal })
             .then(viaggi => {
                 const idsTrovati = viaggi.map(v => v.id);
-                if (idsTrovati.length < chiave.split(",").length) {
-                    // la chiave cambierà e partirà un nuovo caricamento coerente
+                idsCaricati.current = new Set(idsTrovati);
+                const idsRichiesti = chiave.split(",").map(Number);
+                if (idsTrovati.length < idsRichiesti.length) {
+                    // Tolgo dallo store i viaggi che non esistono più: i dati degli altri
+                    // sono già qui, quindi la nuova chiave non provoca una seconda chiamata
                     mantieniSoloInConfronto(idsTrovati);
-                    return;
                 }
                 setRisultato({ chiave, viaggi, errore: null });
             })
